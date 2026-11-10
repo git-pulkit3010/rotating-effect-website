@@ -25,11 +25,31 @@ python3 -m http.server 8000      # then open http://localhost:8000
 
 It works straight from `file://` too — the whole thing is static.
 
-### Continuous integration
+### Continuous integration (optional)
 
-`.github/workflows/verify.yml` runs `node verify.js` on every push, so the
-claim "the geometry is bit-identical to the original" is checked by CI rather
-than merely asserted in this README.
+The geometry check is a plain Node script — `node verify.js` — so it can run
+anywhere. To have GitHub run it on every push, add this file as
+`.github/workflows/verify.yml` (GitHub → *Add file* → *Create new file*):
+
+```yaml
+name: verify
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  geometry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node verify.js
+```
+
+Then the claim "the geometry is bit-identical to the original" is checked by
+CI rather than merely asserted in this README.
 
 ---
 
