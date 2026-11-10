@@ -1,0 +1,293 @@
+/* ---------------------------------------------------------------
+   RING REMADE — styles
+   A faithful re-implementation of the "rotating ring" carousel
+   from demo.filatov.design/offline  (rebuilt from scratch)
+   --------------------------------------------------------------- */
+
+:root{
+  --paper:#ececec;
+  --ink:#0f0f0f;
+  --muted:rgba(15,15,15,.42);
+  --line:rgba(15,15,15,.16);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --morph:cubic-bezier(.16,1,.3,1);
+  --font:"Inter","Helvetica Neue",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--font);-webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+
+/* tiny mono-ish caps label used all over the UI */
+.cap{
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- chrome ---------- */
+.top{
+  position:fixed;top:0;left:0;right:0;height:64px;z-index:40;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;pointer-events:none;
+}
+.top>*{pointer-events:auto}
+.logo{font-size:20px;letter-spacing:.14em;text-decoration:none;color:var(--ink)}
+.logo i{font-style:normal;font-size:10px;vertical-align:super}
+.pill{
+  border:1px dashed var(--ink);background:transparent;color:var(--ink);
+  border-radius:999px;padding:7px 14px;font:inherit;font-size:12px;
+  letter-spacing:.08em;cursor:pointer;
+}
+.pill:hover{background:var(--ink);color:var(--paper)}
+
+/* ---------- stage ---------- */
+.rw{position:relative;height:100svh;min-height:560px;overflow:clip}
+.rw__stage{
+  position:absolute;inset:0;z-index:1;
+  touch-action:pan-y;
+  -webkit-user-select:none;user-select:none;
+  cursor:grab;outline:none;
+}
+.rw__stage:focus-visible{box-shadow:inset 0 0 0 2px var(--ink)}
+.rw.is-dragging .rw__stage{cursor:grabbing}
+
+/* the ring's bodies */
+.rw__bodies{position:absolute;inset:0;z-index:1}
+.rw__body{
+  position:absolute;bottom:0;left:0;
+  transform-origin:50% 100%;
+  will-change:transform,opacity,filter;
+  opacity:0;
+}
+.rw__fig{
+  height:var(--model-h,460px);aspect-ratio:4/7;position:relative;
+  transition:opacity .45s var(--ease);
+}
+.rw__fig img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:contain;object-position:50% 100%;
+  pointer-events:none;-webkit-user-drag:none;
+  transform:translateY(calc(var(--foot,0) * 100%));
+}
+.rw__fig .rw__cast{object-fit:fill;width:150%;left:-25%}
+/* dim everything except what you hover / what is focused */
+.rw__body:not(.is-focus) .rw__fig{opacity:.42}
+.rw__body.is-focus .rw__fig{opacity:1}
+.rw__hit{
+  position:absolute;inset:0;border:0;background:transparent;padding:0;margin:0;
+  cursor:pointer;
+}
+
+/* the sweep of light that runs across on every change */
+.rw__sweep{
+  position:absolute;inset:0;z-index:60;pointer-events:none;
+  mix-blend-mode:soft-light;overflow:hidden;
+}
+.rw__sweep::before{
+  content:"";position:absolute;top:-20%;bottom:-20%;width:42%;
+  background:linear-gradient(100deg,#0000,#ffffff47 42%,#fff9 50%,#ffffff47 58%,#0000);
+  transform:translate(-130%) skew(-12deg);opacity:0;
+}
+.rw__stage.is-sweep .rw__sweep::before{animation:1.5s cubic-bezier(.65,0,.35,1) sweep}
+@keyframes sweep{
+  0%{opacity:0;transform:translate(-130%) skew(-12deg)}
+  35%{opacity:1}
+  100%{opacity:0;transform:translate(230%) skew(-12deg)}
+}
+
+/* ---------- bottom bar ---------- */
+.rw__controls{
+  position:absolute;left:0;right:0;bottom:0;z-index:20;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 16px 24px;pointer-events:none;
+}
+.rw__controls>*{pointer-events:auto}
+.rw__now-top{display:flex;align-items:center;gap:10px}
+.rw__auto{
+  border:1px dashed var(--ink);border-radius:999px;background:transparent;
+  width:26px;height:26px;display:grid;place-items:center;cursor:pointer;color:var(--ink);
+}
+.rw__auto:hover{background:var(--ink);color:var(--paper)}
+.rw__auto .i-play{display:none}
+.rw__auto[aria-pressed="false"] .i-play{display:block}
+.rw__auto[aria-pressed="false"] .i-pause{display:none}
+
+.rw__mini button{
+  border:1px dashed var(--ink);background:transparent;border-radius:999px;
+  width:52px;height:52px;padding:4px;cursor:pointer;display:block;
+}
+.rw__mini button:hover{background:var(--ink)}
+.rw__mini button:hover img{filter:invert(1)}
+.rw__mini img{width:100%;height:100%;object-fit:contain;display:block}
+
+/* view switch */
+.rw__view{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);z-index:30;
+  display:flex;flex-direction:column;overflow:hidden;
+  border:1px dashed var(--ink);border-radius:999px;background:var(--paper);
+}
+.rw__vbtn{
+  border:0;background:transparent;font:inherit;font-size:11px;letter-spacing:.14em;
+  padding:16px 10px;cursor:pointer;color:var(--ink);width:34px;
+}
+.rw__vbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.rw__vbtn:hover{background:var(--ink);color:var(--paper)}
+
+/* ---------- grid mode ---------- */
+.rw__grid-cap{
+  position:absolute;z-index:2;pointer-events:none;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);opacity:0;transition:opacity .6s var(--ease);
+  white-space:nowrap;
+}
+.rw.is-grid .rw__grid-cap{opacity:1;transition-delay:calc(.5s + var(--i) * 40ms)}
+.rw.is-grid .rw__mini,
+.rw.is-grid .rw__plus,
+.rw.is-grid .rw__now{opacity:0;pointer-events:none}
+
+/* ---------- index overlay ---------- */
+.rw__idx{
+  position:absolute;inset:0;z-index:70;visibility:hidden;pointer-events:none;
+  background:rgba(0,0,0,.08);backdrop-filter:blur(2px);
+  display:flex;align-items:center;justify-content:center;
+}
+.rw.is-index .rw__idx{visibility:visible;pointer-events:auto}
+.rw__idx-panel{
+  background:var(--paper);border:1px dashed var(--ink);border-radius:20px;
+  padding:24px;width:min(420px,86vw);max-height:70vh;overflow:auto;
+}
+.rw__idx-list{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:6px}
+.rw__idx-item{
+  display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:baseline;
+  width:100%;text-align:left;border:0;background:transparent;font:inherit;color:var(--ink);
+  padding:10px 8px;cursor:pointer;border-radius:10px;
+}
+.rw__idx-item:hover{background:rgba(0,0,0,.06)}
+.rw__idx-item[aria-current="true"]{outline:1px dashed var(--ink)}
+.rw__idx-name{font-size:17px}
+
+/* ---------- lightbox ---------- */
+.rw__lb{
+  position:absolute;inset:0;z-index:80;visibility:hidden;pointer-events:none;
+  background:var(--paper);
+}
+.rw.is-zoom .rw__lb{visibility:visible;pointer-events:auto}
+.rw__lb-stage{position:absolute;inset:0;display:grid;place-items:center}
+.rw__lb-model{position:relative;transform-origin:0 100%;transition:transform .9s var(--ease)}
+.rw__lb-model .rw__fig{opacity:1}
+.rw__lb-close{
+  position:absolute;top:16px;right:16px;z-index:5;
+}
+.rw__pins{position:absolute;inset:0}
+.rw__pin{
+  position:absolute;transform:translate(-50%,-50%);
+  width:26px;height:26px;border-radius:50%;border:1px solid var(--ink);
+  background:var(--paper);cursor:pointer;font:inherit;font-size:11px;
+  display:grid;place-items:center;padding:0;
+}
+.rw__pin:hover,.rw__pin.is-hot{background:var(--ink);color:var(--paper)}
+.rw__tip{
+  position:absolute;left:50%;bottom:130%;transform:translateX(-50%);
+  background:var(--ink);color:var(--paper);padding:6px 10px;border-radius:8px;
+  white-space:nowrap;font-size:12px;display:none;
+}
+.rw__pin:hover .rw__tip,.rw__pin.is-hot .rw__tip{display:block}
+.rw__tip b{font-weight:600}
+.rw__tip span{opacity:.7;margin-left:6px}
+
+/* ---------- custom cursor (desktop only) ---------- */
+.rw__cursor{position:absolute;top:0;left:0;z-index:90;pointer-events:none;display:none}
+.rw.has-cursor .rw__cursor{display:block}
+.rw__cursor-in{
+  position:absolute;top:-40px;left:-40px;width:80px;height:80px;border-radius:50%;
+  border:1px dashed var(--ink);background:rgba(255,255,255,.6);
+  backdrop-filter:blur(6px);
+  display:grid;place-items:center;transform:scale(.3);opacity:0;
+  transition:transform .5s var(--ease),opacity .3s,background-color .3s,color .3s;
+}
+.rw__cursor.is-on .rw__cursor-in{opacity:1;transform:scale(1)}
+.rw__cursor b{grid-area:1/1;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+.rw__cursor .c-view{opacity:0}
+.rw__cursor.is-view .c-drag{opacity:0}
+.rw__cursor.is-view .c-view{opacity:1}
+.rw__cursor.is-view .rw__cursor-in{background:var(--ink);color:var(--paper);border-style:solid}
+.rw.has-cursor .rw__stage,.rw.has-cursor .rw__stage *{cursor:none}
+
+.rw.is-zoom :is(.rw__bodies,.rw__controls,.rw__now,.rw__mini,.rw__plus,.rw__view){
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.rw__bodies,.rw__controls,.rw__now,.rw__mini,.rw__plus,.rw__view{transition:opacity .6s var(--ease)}
+
+@media (max-width:809px){
+  .rw__mini{display:none}
+  .rw__now-name{font-size:16px}
+}
+
+/* ---------------------------------------------------------------
+   grid mode: the morph between ring and grid is a CSS transition,
+   so the class .is-anim is only present while the shape changes.
+   (a transition on .rw__body outside of .is-anim would fight the
+    JS spring and make the ring feel laggy — never do that)
+   --------------------------------------------------------------- */
+.rw__gridcaps{position:absolute;inset:0;z-index:2;pointer-events:none}
+.rw__grid-cap{position:absolute;top:0;left:0}
+.rw.is-anim .rw__body{
+  transition:transform 1.25s var(--morph) var(--d,0s),
+             opacity .8s var(--ease) var(--d,0s),
+             filter .8s var(--ease) var(--d,0s);
+}
+.rw.is-anim .rw__body.is-focus .rw__fig{opacity:1}
+
+/* ---------------------------------------------------------------
+   bottom bar — the "now playing" counter, the piece rail and the
+   shop button all sit on one baseline row.
+   --------------------------------------------------------------- */
+.rw__controls{
+  position:absolute;left:0;right:0;bottom:0;z-index:20;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 16px 24px;pointer-events:none;
+}
+.rw__controls>*{pointer-events:auto}
+.rw__now{display:flex;flex-direction:column;gap:8px;min-width:0}
+.rw__now-top{display:flex;align-items:center;gap:12px}
+.rw__now-name{
+  font-size:24px;line-height:24px;font-weight:300;letter-spacing:-.02em;
+  text-transform:uppercase;white-space:nowrap;
+}
+.rw__mini{
+  position:absolute;left:50%;bottom:26px;transform:translateX(-50%);
+  display:flex;gap:8px;margin:0;padding:0;list-style:none;
+}
+.rw__plus{
+  width:56px;height:56px;border-radius:50%;border:0;background:var(--ink);
+  color:var(--paper);display:grid;place-items:center;cursor:pointer;
+}
+.rw__plus:hover{transform:scale(1.06)}
+
+/* vertical (rotated) view switcher, like the original */
+.rw__vbtn{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  text-transform:uppercase;letter-spacing:.14em;
+  border:0;background:transparent;font:inherit;font-size:11px;
+  padding:16px 0;cursor:pointer;color:var(--ink);width:34px;
+}
+
+@media (max-width:809px){
+  .rw__mini{
+    display:flex;bottom:92px;gap:6px;
+  }
+  .rw__mini button{width:40px;height:40px;padding:3px}
+  .rw__now-name{font-size:16px;line-height:16px}
+  .rw__plus{width:48px;height:48px}
+}
+
+/* index button (left edge, like the original) */
+.rw__indexbtn{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);z-index:30;
+  writing-mode:vertical-rl;transform:translateY(-50%) rotate(180deg);
+  padding:16px 10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+}
+.rw.is-index .rw__indexbtn{background:var(--ink);color:var(--paper)}

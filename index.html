@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ececec">
+<title>RING — rotating carousel remake</title>
+<link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+
+<header class="top">
+  <span class="cap" id="clock">00:00</span>
+  <a class="logo" href="#">RING<i>®</i></a>
+  <button class="pill" type="button" id="bag">Bag (<span id="bagCount">0</span>)</button>
+</header>
+
+<section class="rw" id="rw">
+
+  <div class="rw__stage" id="stage" tabindex="0" role="region"
+       aria-roledescription="carousel" aria-label="Looks — drag, arrow keys, or scroll to turn the ring">
+
+    <div class="rw__bodies" id="bodies"></div>
+    <div class="rw__gridcaps" id="gridcaps"></div>
+    <span class="rw__sweep"></span>
+
+    <span class="rw__cursor" id="cursor" aria-hidden="true">
+      <span class="rw__cursor-in"><b class="c-drag">Drag</b><b class="c-view">View</b></span>
+    </span>
+  </div>
+
+  <div class="rw__controls">
+    <div class="rw__now">
+      <span class="rw__now-top">
+        <span class="cap"><span id="nowi">01</span> / <span id="nowt">09</span></span>
+        <button class="rw__auto" id="auto" type="button" aria-pressed="true" aria-label="Autoplay">
+          <svg class="i-pause" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M6.5 4.5h3.5v15H6.5zM14 4.5h3.5v15H14z"/></svg>
+          <svg class="i-play" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M7 4.5v15l12.5-7.5z"/></svg>
+        </button>
+      </span>
+      <span class="rw__now-name" id="nown">Do Not Disturb</span>
+    </div>
+
+    <ul class="rw__mini" id="mini" aria-label="Pieces in this look"></ul>
+
+    <button class="rw__plus" id="plus" type="button" aria-label="Shop the look">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+        <path d="M12 4v16M4 12h16"/></svg>
+    </button>
+  </div>
+
+  <button class="rw__indexbtn pill" id="indexbtn" type="button" aria-expanded="false" aria-controls="idx">Index</button>
+
+  <!-- view switch -->
+  <div class="rw__view" role="group" aria-label="View mode">
+    <button class="rw__vbtn" type="button" data-v="ring" aria-pressed="true">RING</button>
+    <button class="rw__vbtn" type="button" data-v="grid" aria-pressed="false">GRID</button>
+  </div>
+
+  <!-- lightbox -->
+  <div class="rw__lb" id="lb" aria-hidden="true">
+    <button class="pill rw__lb-close" id="lbclose" type="button">Close</button>
+    <div class="rw__lb-stage" id="lbstage"></div>
+  </div>
+
+  <!-- index -->
+  <div class="rw__idx" id="idx" aria-hidden="true">
+    <div class="rw__idx-panel">
+      <span class="cap">Index — 9 looks</span>
+      <ul class="rw__idx-list" id="idxlist"></ul>
+      <div style="margin-top:16px;text-align:right">
+        <button class="pill" id="idxclose" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<script src="app.js?v=3"></script>
+</body>
+</html>
